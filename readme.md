@@ -2,6 +2,8 @@
 
 [Insert Duplicate Key Update](http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html) is a quick way to do mass insert.
 
+It's a trait meant to be used with Laravel's Eloquent ORM.
+
 ### Code Example
 
 ```php
@@ -39,8 +41,11 @@ class UserTest extends Model
 
 ### created_at and updated_at fields.
 
-created_at and updated_at will not be updated automatically.  You can pass the database in the $data array as:
-['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), ],
+created_at and updated_at will *not* be updated automatically.  To update you can pass the fields in the insert array.
+
+```php
+['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
+```
 
 ### Will this work on Postgresql?
 
@@ -48,4 +53,4 @@ No.  On Duplicate Key Update is only available on MySQL.  Postgresql 9.4 has a s
 
 ### Isn't this the same as updateOrCreate()?
 
-It's similar but not the same.  The updateOrCreate will only work on one row at a time. InsertOnDuplicateKey will on many rows.
+It is similar but not the same.  The updateOrCreate() will only work for one row. InsertOnDuplicateKey will work on many rows.

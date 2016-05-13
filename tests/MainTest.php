@@ -45,23 +45,13 @@ class MainTest extends BootstrapTest
         $this->invokeMethod($this->user, 'getColumnList', [$data]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGetColumnListNotAssociativeArray()
-    {
-        $data = [1, 'user1@email.com', 'User One'];;
-
-        $result = $this->invokeMethod($this->user, 'getColumnList', [$data]);
-    }
-
     public function testGetColumnList()
     {
         $data = $this->getDataForInsert();
 
         $expected = '`id`,`email`,`name`';
 
-        $result = $this->invokeMethod($this->user, 'getColumnList', [$data]);
+        $result = $this->invokeMethod($this->user, 'getColumnList', [$data[0]]);
 
         $this->assertEquals($expected, $result);
     }
@@ -72,7 +62,7 @@ class MainTest extends BootstrapTest
 
         $expected = '`id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
-        $result = $this->invokeMethod($this->user, 'buildValuesList', [$data]);
+        $result = $this->invokeMethod($this->user, 'buildValuesList', [$data[0]]);
 
         $this->assertEquals($expected, $result);
     }
@@ -86,6 +76,17 @@ class MainTest extends BootstrapTest
         $expected = [1, 'user1@email.com', 'User One'];
 
         $result = $this->invokeMethod($this->user, 'inLineArray', [$data]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBuildQuestionMarks()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = '(?,?,?), (?,?,?), (?,?,?)';
+
+        $result = $this->invokeMethod($this->user, 'buildQuestionMarks', [$data]);
 
         $this->assertEquals($expected, $result);
     }
@@ -131,5 +132,15 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
         $result = $this->invokeMethod($this->user, 'buildSql', [$data]);
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInsertWithBadId()
+    {
+        $data =  ['incorrect_id_field' => 1, 'email' => 'user1@email.com', 'name' => 'User One'];
+
+        $this->user->insertOnDuplicateKey($data);
     }
 }

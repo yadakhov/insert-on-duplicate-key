@@ -7,6 +7,39 @@ use Illuminate\Support\Facades\DB;
 trait InsertOnDuplicateKey
 {
     /**
+     * Insert using mysql on duplicate key update.
+     * @link http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
+     *
+     * Example:  $data = [
+     *     ['id' => 1, 'name' => 'John'],
+     *     ['id' => 2, 'name' => 'Mike'],
+     * ];
+     *
+     * @param array $data is an array of array.
+     *
+     * @return bool
+     */
+    public static function insertOnDuplicateKey(array $data)
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        // Case where $data is not an array of arrays.
+        if (!isset($data[0])) {
+            $data = [$data];
+        }
+
+        static::checkPrimaryKeyExists($data);
+
+        $sql = static::buildSql($data);
+
+        $data = static::inLineArray($data);
+
+        return DB::statement($sql, $data);
+    }
+
+    /**
      * Static function for getting table name.
      *
      * @return string
@@ -31,53 +64,6 @@ trait InsertOnDuplicateKey
     }
 
     /**
-     * Insert using mysql on duplicate key update.
-     * @link http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
-     *
-     * @param array $data Associative array. Must have the id column.
-     *
-     * @return bool
-     */
-    public static function insertOnDuplicateKey(array $data)
-    {
-        if (empty($data)) {
-            return false;
-        }
-
-        if (count($data) === 1) {
-            $data = [$data];
-        }
-
-        // Check to make sure $data contains the primary key
-        $primaryKey = static::getPrimaryKey();
-        $hasKey = false;
-
-        list($first) = $data;
-
-        if (!is_array($first)) {
-            throw new \InvalidArgumentException('Not an associative array.');
-        }
-
-        foreach (array_keys($first) as $key) {
-            if ($key === $primaryKey) {
-                $hasKey = true;
-                break;
-            }
-        }
-
-        if ($hasKey === false) {
-            throw new \InvalidArgumentException('Missing primary key in the data: ' . $primaryKey);
-        }
-
-        $sql = static::buildSql($data);
-
-        $data = static::inLineArray($data);
-
-        return DB::statement($sql, $data);
-    }
-
-
-    /**
      * Build the question mark placeholder.  Helper function for insertOnDuplicateKeyUpdate().
      * Helper function for insertOnDuplicateKeyUpdate().
      *
@@ -85,7 +71,7 @@ trait InsertOnDuplicateKey
      *
      * @return string
      */
-    protected static function buildPlaceHolder($data)
+    protected static function buildQuestionMarks($data)
     {
         $lines = [];
         foreach ($data as $row) {
@@ -101,13 +87,13 @@ trait InsertOnDuplicateKey
     }
 
     /**
-     * Build a value list.
+     * Get the first row of the $data array.
      *
      * @param array $data
      *
-     * @return string
+     * @return mixed
      */
-    protected static function getColumnList(array $data)
+    protected static function getFirstRow(array $data)
     {
         if (empty($data)) {
             throw new \InvalidArgumentException('Empty data.');
@@ -116,7 +102,49 @@ trait InsertOnDuplicateKey
         list($first) = $data;
 
         if (!is_array($first)) {
-            throw new \InvalidArgumentException('Not an associative array.');
+            throw new \InvalidArgumentException('$data is not an array of array.');
+        }
+
+        return $first;
+    }
+
+    /**
+     * Check to make sure the first row as the primary key.
+     * Every row needs to have the primary key but we will only check the first row for efficiency.
+     *
+     * @param array $data
+     */
+    protected static function checkPrimaryKeyExists(array $data)
+    {
+        // Check to make sure $data contains the primary key
+        $primaryKey = static::getPrimaryKey();
+        $hasKey = false;
+
+        $first = static::getFirstRow($data);
+
+        foreach (array_keys($first) as $key) {
+            if ($key === $primaryKey) {
+                $hasKey = true;
+                break;
+            }
+        }
+
+        if ($hasKey === false) {
+            throw new \InvalidArgumentException(sprintf('Missing primary key %s.', $primaryKey));
+        }
+    }
+
+    /**
+     * Build a value list.
+     *
+     * @param array $first
+     *
+     * @return string
+     */
+    protected static function getColumnList(array $first)
+    {
+        if (empty($first)) {
+            throw new \InvalidArgumentException('Empty array.');
         }
 
         return '`' . implode('`,`', array_keys($first)) . '`';
@@ -125,22 +153,12 @@ trait InsertOnDuplicateKey
     /**
      * Build a value list.
      *
-     * @param array $data
+     * @param array $first
      *
      * @return string
      */
-    protected static function buildValuesList(array $data)
+    protected static function buildValuesList(array $first)
     {
-        if (empty($data)) {
-            throw new \InvalidArgumentException('Empty data.');
-        }
-
-        list($first) = $data;
-
-        if (!is_array($first)) {
-            throw new \InvalidArgumentException('Not an associative array.');
-        }
-
         $out = [];
 
         foreach (array_keys($first) as $key) {
@@ -151,7 +169,7 @@ trait InsertOnDuplicateKey
     }
 
     /**
-     * Inline a multiple dimension array.  Helper function for insertOnDuplicateKeyUpdate().
+     * Inline a multiple dimensions array.
      *
      * @param $data
      *
@@ -170,11 +188,20 @@ trait InsertOnDuplicateKey
         return $out;
     }
 
+    /**
+     * Build the INSERT ON DUPLICATE KEY sql statement.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
     protected static function buildSql(array $data)
     {
-        $sql  = 'INSERT INTO `' .  static::getTableName() . '`(' . static::getColumnList($data) . ') VALUES' . PHP_EOL;
-        $sql .=  static::buildPlaceHolder($data) . PHP_EOL;
-        $sql .= 'ON DUPLICATE KEY UPDATE ' . static::buildValuesList($data);
+        $first = static::getFirstRow($data);
+
+        $sql  = 'INSERT INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql .=  static::buildQuestionMarks($data) . PHP_EOL;
+        $sql .= 'ON DUPLICATE KEY UPDATE ' . static::buildValuesList($first);
 
         return $sql;
     }
