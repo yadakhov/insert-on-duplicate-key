@@ -29,7 +29,7 @@ class UserTest extends Model
     User::insertOnDuplicateKey($users);
 ```
 
-#### This is equivalent to running the following SQL statment:
+#### This is equivalent to running the following SQL statement:
 
 ```sql
     INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
