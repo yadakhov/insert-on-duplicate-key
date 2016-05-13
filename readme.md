@@ -13,6 +13,7 @@ use Yadakhov\InsertOnDuplicateKey;
  */
 class UserTest extends Model
 {
+    // The function is implemented as a trait.
     use InsertOnDuplicateKey;
 }
 ```

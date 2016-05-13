@@ -1,7 +1,7 @@
 {
     "name": "yadakhov/on-duplicate-key-update",
     "type": "library",
-    "description": "A trait for MySQL ON DUPLICATE KYE UDPATE.",
+    "description": "A trait for MySQL INSERT ON DUPLICATE KEY UDPATE.",
     "keywords": [
         "database",
         "mysql",
