@@ -1,5 +1,5 @@
 {
-    "name": "yadakhov/on-duplicate-key-update",
+    "name": "yadakhov/insert-on-duplicate-key",
     "type": "library",
     "description": "A trait for MySQL INSERT ON DUPLICATE KEY UDPATE.",
     "keywords": [
@@ -7,7 +7,7 @@
         "mysql",
         "eloquent"
     ],
-    "homepage": "https://github.com/yadakhov/on-duplicate-key-update",
+    "homepage": "https://github.com/yadakhov/insert-on-duplicate-key",
     "license": "MIT",
     "authors": [
         {
