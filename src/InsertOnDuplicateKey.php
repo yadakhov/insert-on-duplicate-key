@@ -44,6 +44,10 @@ trait InsertOnDuplicateKey
             return false;
         }
 
+        if (count($data) === 1) {
+            $data = [$data];
+        }
+
         // Check to make sure $data contains the primary key
         $primaryKey = static::getPrimaryKey();
         $hasKey = false;

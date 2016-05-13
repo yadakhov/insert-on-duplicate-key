@@ -37,6 +37,11 @@ class UserTest extends Model
     ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)
 ```
 
+### created_at and updated_at fields.
+
+created_at and updated_at will not be updated automatically.  You can pass the database in the $data array as:
+['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now(), ],
+
 ### Will this work on Postgresql?
 
 No.  On Duplicate Key Update is only available on MySQL.  Postgresql 9.4 has a similar feature called [UPSERT](https://wiki.postgresql.org/wiki/UPSERT).
