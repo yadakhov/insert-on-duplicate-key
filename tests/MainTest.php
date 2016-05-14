@@ -106,7 +106,7 @@ class MainTest extends BootstrapTest
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildSqlSimple()
+    public function testBuildInsertOnDuplicateSqlSimple()
     {
         $data = [
             ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
@@ -116,12 +116,12 @@ class MainTest extends BootstrapTest
 (?,?,?)
 ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
-        $result = $this->invokeMethod($this->user, 'buildSql', [$data]);
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data]);
 
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildSqlMultiple()
+    public function testBuildInsertOnDuplicateSqlMultiple()
     {
         $data = $this->getDataForInsert();
 
@@ -129,7 +129,7 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
 (?,?,?), (?,?,?), (?,?,?)
 ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
-        $result = $this->invokeMethod($this->user, 'buildSql', [$data]);
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data]);
 
         $this->assertEquals($expected, $result);
     }
@@ -142,5 +142,31 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
         $data =  ['incorrect_id_field' => 1, 'email' => 'user1@email.com', 'name' => 'User One'];
 
         $this->user->insertOnDuplicateKey($data);
+    }
+
+    public function testBuildInsertIgnoreSqlSimple()
+    {
+        $data = [
+            ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
+        ];
+
+        $expected = 'INSERT IGNORE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?)';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertIgnoreSql', [$data]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBuildInsertIgnoreSqlMulitple()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = 'INSERT IGNORE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?), (?,?,?), (?,?,?)';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertIgnoreSql', [$data]);
+
+        $this->assertEquals($expected, $result);
     }
 }

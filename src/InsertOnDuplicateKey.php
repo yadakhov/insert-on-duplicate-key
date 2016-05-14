@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 trait InsertOnDuplicateKey
 {
     /**
-     * Insert using mysql on duplicate key update.
+     * Insert using mysql ON DUPLICATE KEY UPDATE.
      * @link http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html
      *
      * Example:  $data = [
@@ -32,7 +32,34 @@ trait InsertOnDuplicateKey
 
         static::checkPrimaryKeyExists($data);
 
-        $sql = static::buildSql($data);
+        $sql = static::buildInsertOnDuplicateSql($data);
+
+        $data = static::inLineArray($data);
+
+        return DB::statement($sql, $data);
+    }
+
+    /**
+     * Insert using mysql INSERT IGNORE INTO.
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public static function insertIgnore(array $data)
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        // Case where $data is not an array of arrays.
+        if (!isset($data[0])) {
+            $data = [$data];
+        }
+
+        static::checkPrimaryKeyExists($data);
+
+        $sql = static::buildInsertIgnoreSql($data);
 
         $data = static::inLineArray($data);
 
@@ -195,13 +222,30 @@ trait InsertOnDuplicateKey
      *
      * @return string
      */
-    protected static function buildSql(array $data)
+    protected static function buildInsertOnDuplicateSql(array $data)
     {
         $first = static::getFirstRow($data);
 
         $sql  = 'INSERT INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data) . PHP_EOL;
         $sql .= 'ON DUPLICATE KEY UPDATE ' . static::buildValuesList($first);
+
+        return $sql;
+    }
+
+    /**
+     * Build the INSERT IGNORE sql statement.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    protected static function buildInsertIgnoreSql(array $data)
+    {
+        $first = static::getFirstRow($data);
+
+        $sql  = 'INSERT IGNORE INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql .=  static::buildQuestionMarks($data);
 
         return $sql;
     }

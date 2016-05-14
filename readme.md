@@ -34,9 +34,20 @@ class UserTest extends Model
 #### This is equivalent to running the following SQL statement:
 
 ```sql
-    INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
+    INSERT INTO `users`(`id`,`email`,`name`) VALUES
     (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three')
     ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)
+```
+
+```php
+    User::insertIgnore($users);
+```
+
+#### This is equivalent to running the following SQL statement:
+
+```sql
+    INSERT IGNORE INTO `users`(`id`,`email`,`name`) VALUES
+    (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three');
 ```
 
 ### created_at and updated_at fields.
