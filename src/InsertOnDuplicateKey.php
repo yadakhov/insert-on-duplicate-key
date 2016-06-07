@@ -67,6 +67,33 @@ trait InsertOnDuplicateKey
     }
 
     /**
+     * Insert using mysql REPLACE INTO.
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public static function replace(array $data)
+    {
+        if (empty($data)) {
+            return false;
+        }
+
+        // Case where $data is not an array of arrays.
+        if (!isset($data[0])) {
+            $data = [$data];
+        }
+
+        static::checkPrimaryKeyExists($data);
+
+        $sql = static::buildReplaceSql($data);
+
+        $data = static::inLineArray($data);
+
+        return DB::statement($sql, $data);
+    }
+
+    /**
      * Static function for getting table name.
      *
      * @return string
@@ -245,6 +272,23 @@ trait InsertOnDuplicateKey
         $first = static::getFirstRow($data);
 
         $sql  = 'INSERT IGNORE INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql .=  static::buildQuestionMarks($data);
+
+        return $sql;
+    }
+
+    /**
+     * Build REPLACE sql statement.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
+    protected static function buildReplaceSql(array $data)
+    {
+        $first = static::getFirstRow($data);
+
+        $sql  = 'REPLACE INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data);
 
         return $sql;

@@ -169,4 +169,30 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testBuildReplaceSqlSimple()
+    {
+        $data = [
+            ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
+        ];
+
+        $expected = 'REPLACE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?)';
+
+        $result = $this->invokeMethod($this->user, 'buildReplaceSql', [$data]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBuildReplaceSqlMulitple()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = 'REPLACE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?), (?,?,?), (?,?,?)';
+
+        $result = $this->invokeMethod($this->user, 'buildReplaceSql', [$data]);
+
+        $this->assertEquals($expected, $result);
+    }
 }
