@@ -21,32 +21,53 @@ class UserTest extends Model
 ```
 
 #### Multi values insert.
-```
+```php
     $users = [
         ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One'],
         ['id' => 2, 'email' => 'user2@email.com', 'name' => 'User Two'],
         ['id' => 3, 'email' => 'user3@email.com', 'name' => 'User Three'],
     ];
-
-    User::insertOnDuplicateKey($users);
 ```
 
-#### This is equivalent to running the following SQL statement:
+#### INSERT ON DUPLICATE KEY UPDATE
 
+```php
+    User::insertOnDuplicateKey($users);
+```
 ```sql
+    -- produces this query
     INSERT INTO `users`(`id`,`email`,`name`) VALUES
     (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three')
     ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)
 ```
 
 ```php
-    User::insertIgnore($users);
+    User::insertOnDuplicateKey($users, ['email']);
+```
+```sql
+    -- produces this query
+    INSERT INTO `users`(`id`,`email`,`name`) VALUES
+    (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three')
+    ON DUPLICATE KEY UPDATE `email` = VALUES(`email`)
 ```
 
-#### This is equivalent to running the following SQL statement:
-
+#### INSERT IGNORE
+```php
+    User::insertIgnore($users);
+```
 ```sql
+    -- produces this query
     INSERT IGNORE INTO `users`(`id`,`email`,`name`) VALUES
+    (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three');
+```
+
+#### REPLACE INTO
+```php
+    User::replace($users);
+```
+```sql
+    -- produces this query
+    REPLACE INTO `users`(`id`,`email`,`name`) VALUES
     (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three');
 ```
 

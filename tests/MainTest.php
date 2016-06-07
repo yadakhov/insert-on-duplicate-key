@@ -134,6 +134,19 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
         $this->assertEquals($expected, $result);
     }
 
+    public function testBuildInsertOnDuplicateSqlMultipleWithUpdateColumn()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = 'INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?), (?,?,?), (?,?,?)
+ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data, ['name']]);
+
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
