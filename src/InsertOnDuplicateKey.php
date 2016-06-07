@@ -16,10 +16,11 @@ trait InsertOnDuplicateKey
      * ];
      *
      * @param array $data is an array of array.
+     * @param array $updateColumns NULL or empty[] means update all columns
      *
      * @return bool
      */
-    public static function insertOnDuplicateKey(array $data)
+    public static function insertOnDuplicateKey(array $data, array $updateColumns = null)
     {
         if (empty($data)) {
             return false;
@@ -32,7 +33,7 @@ trait InsertOnDuplicateKey
 
         static::checkPrimaryKeyExists($data);
 
-        $sql = static::buildInsertOnDuplicateSql($data);
+        $sql = static::buildInsertOnDuplicateSql($data, $updateColumns);
 
         $data = static::inLineArray($data);
 
@@ -246,16 +247,23 @@ trait InsertOnDuplicateKey
      * Build the INSERT ON DUPLICATE KEY sql statement.
      *
      * @param array $data
+     * @param array $updateColumns
      *
      * @return string
      */
-    protected static function buildInsertOnDuplicateSql(array $data)
+    protected static function buildInsertOnDuplicateSql(array $data, array $updateColumns = null)
     {
         $first = static::getFirstRow($data);
 
         $sql  = 'INSERT INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data) . PHP_EOL;
-        $sql .= 'ON DUPLICATE KEY UPDATE ' . static::buildValuesList($first);
+        $sql .= 'ON DUPLICATE KEY UPDATE ';
+
+        if (empty($updateColumns)) {
+            $sql .= static::buildValuesList($first);
+        } else {
+            $sql .= static::buildValuesList(array_combine($updateColumns, $updateColumns));
+        }
 
         return $sql;
     }
