@@ -31,8 +31,6 @@ trait InsertOnDuplicateKey
             $data = [$data];
         }
 
-        static::checkPrimaryKeyExists($data);
-
         $sql = static::buildInsertOnDuplicateSql($data, $updateColumns);
 
         $data = static::inLineArray($data);
@@ -58,8 +56,6 @@ trait InsertOnDuplicateKey
             $data = [$data];
         }
 
-        static::checkPrimaryKeyExists($data);
-
         $sql = static::buildInsertIgnoreSql($data);
 
         $data = static::inLineArray($data);
@@ -84,8 +80,6 @@ trait InsertOnDuplicateKey
         if (!isset($data[0])) {
             $data = [$data];
         }
-
-        static::checkPrimaryKeyExists($data);
 
         $sql = static::buildReplaceSql($data);
 
@@ -161,32 +155,6 @@ trait InsertOnDuplicateKey
         }
 
         return $first;
-    }
-
-    /**
-     * Check to make sure the first row as the primary key.
-     * Every row needs to have the primary key but we will only check the first row for efficiency.
-     *
-     * @param array $data
-     */
-    protected static function checkPrimaryKeyExists(array $data)
-    {
-        // Check to make sure $data contains the primary key
-        $primaryKey = static::getPrimaryKey();
-        $hasKey = false;
-
-        $first = static::getFirstRow($data);
-
-        foreach (array_keys($first) as $key) {
-            if ($key === $primaryKey) {
-                $hasKey = true;
-                break;
-            }
-        }
-
-        if ($hasKey === false) {
-            throw new \InvalidArgumentException(sprintf('Missing primary key %s.', $primaryKey));
-        }
     }
 
     /**

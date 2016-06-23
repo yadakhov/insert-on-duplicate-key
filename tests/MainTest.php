@@ -147,16 +147,6 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInsertWithBadId()
-    {
-        $data =  ['incorrect_id_field' => 1, 'email' => 'user1@email.com', 'name' => 'User One'];
-
-        $this->user->insertOnDuplicateKey($data);
-    }
-
     public function testBuildInsertIgnoreSqlSimple()
     {
         $data = [
