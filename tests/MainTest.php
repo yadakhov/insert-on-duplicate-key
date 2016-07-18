@@ -198,4 +198,23 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testInLineArray()
+    {
+        $rows = [
+            ['id' => 1, 'email' => '1@email.com'],
+            ['id' => 2, 'email' => '2@email.com'],
+        ];
+
+        $result = $this->invokeMethod($this->user, 'inLineArray', [$rows]);
+
+        $expected = [
+            1,
+            '1@email.com',
+            2,
+            '2@email.com',
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
 }
