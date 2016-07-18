@@ -200,15 +200,7 @@ trait InsertOnDuplicateKey
      */
     protected static function inLineArray(array $data)
     {
-        $out = [];
-
-        foreach ($data as $row) {
-            foreach ($row as $item) {
-                $out[] = $item;
-            }
-        }
-
-        return $out;
+        return call_user_func_array('array_merge', array_map('array_values', $data));
     }
 
     /**
