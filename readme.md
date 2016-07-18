@@ -1,5 +1,7 @@
 ### MySQL Insert On Duplicate Key Update Eloquent Trait
 
+[![Build Status](https://travis-ci.org/yadakhov/insert-on-duplicate-key.svg)](https://travis-ci.org/yadakhov/insert-on-duplicate-key)
+
 [Insert Duplicate Key Update](http://dev.mysql.com/doc/refman/5.7/en/insert-on-duplicate.html) is a quick way to do mass insert.
 
 It's a trait meant to be used with Laravel's Eloquent ORM.
