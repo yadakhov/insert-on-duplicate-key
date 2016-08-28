@@ -35,7 +35,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::statement($sql, $data);
+        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
     }
 
     /**
@@ -60,7 +60,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::statement($sql, $data);
+        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
     }
 
     /**
@@ -85,7 +85,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::statement($sql, $data);
+        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
     }
 
     /**
@@ -98,6 +98,17 @@ trait InsertOnDuplicateKey
         $class = get_called_class();
 
         return (new $class())->getTable();
+    }
+
+    /**
+    * Static function for getting connection name
+    *
+    * @return string
+    */
+    public static function getModelConnectionName()
+    {
+        $class = get_called_class();
+        return (new $class())->getConnectionName();
     }
 
     /**
