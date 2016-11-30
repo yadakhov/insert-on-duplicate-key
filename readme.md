@@ -17,7 +17,7 @@ use Yadakhov\InsertOnDuplicateKey;
 /**
  * Class User.
  */
-class UserTest extends Model
+class User extends Model
 {
     // The function is implemented as a trait.
     use InsertOnDuplicateKey;
@@ -89,4 +89,4 @@ No.  On Duplicate Key Update is only available on MySQL.  Postgresql 9.4 has a s
 
 ### Isn't this the same as updateOrCreate()?
 
-It is similar but not the same.  The updateOrCreate() will only work for one row. InsertOnDuplicateKey will work on many rows.
+It is similar but not the same.  The updateOrCreate() will only work for one row at a time which doesn't allow bulk insert. InsertOnDuplicateKey will work on many rows.

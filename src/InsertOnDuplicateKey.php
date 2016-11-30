@@ -2,8 +2,6 @@
 
 namespace Yadakhov;
 
-use Illuminate\Support\Facades\DB;
-
 trait InsertOnDuplicateKey
 {
     /**
@@ -16,7 +14,7 @@ trait InsertOnDuplicateKey
      * ];
      *
      * @param array $data is an array of array.
-     * @param array $updateColumns NULL or empty[] means update all columns
+     * @param array $updateColumns NULL or [] means update all columns
      *
      * @return bool
      */
@@ -35,7 +33,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
+        return self::getModelConnectionName()->statement($sql, $data);
     }
 
     /**
@@ -60,7 +58,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
+        return self::getModelConnectionName()->statement($sql, $data);
     }
 
     /**
@@ -85,7 +83,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return DB::connection(static::getModelConnectionName())->statement($sql, $data);
+        return self::getModelConnectionName()->statement($sql, $data);
     }
 
     /**
@@ -95,9 +93,9 @@ trait InsertOnDuplicateKey
      */
     public static function getTableName()
     {
-        $class = get_called_class();
+        $class = static::class;
 
-        return (new $class())->getTable();
+        return $class::getTable();
     }
 
     /**
@@ -107,8 +105,9 @@ trait InsertOnDuplicateKey
     */
     public static function getModelConnectionName()
     {
-        $class = get_called_class();
-        return (new $class())->getConnectionName();
+        $class = static::class;
+
+        return $class::getConnection();
     }
 
     /**

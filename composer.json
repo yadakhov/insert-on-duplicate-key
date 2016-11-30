@@ -13,12 +13,10 @@
         {
             "name": "Yada Khov",
             "email": "yada.khov@gmail.com",
-            "homepage": "http://yadakhov.com"
+            "homepage": "https://github.com/yadakhov"
         }
     ],
     "require": {
-        "php": ">=5.4.0",
-        "illuminate/support": "^5.1",
         "illuminate/database": "^5.1"
     },
     "require-dev": {
