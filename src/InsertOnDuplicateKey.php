@@ -93,9 +93,9 @@ trait InsertOnDuplicateKey
      */
     public static function getTableName()
     {
-        $class = static::class;
+        $class = get_called_class();
 
-        return $class::getTable();
+        return (new $class())->getTable();
     }
 
     /**
@@ -105,9 +105,9 @@ trait InsertOnDuplicateKey
     */
     public static function getModelConnectionName()
     {
-        $class = static::class;
+        $class = get_called_class();
 
-        return $class::getConnection();
+        return (new $class())->getConnection();
     }
 
     /**
