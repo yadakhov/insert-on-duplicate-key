@@ -38,4 +38,14 @@ class UserTest extends Model
     protected $table = 'test_user_table';
 
     protected $primaryKey = 'uuid';
+
+    /**
+     * Override this method for unit test because we don't have a table connection.
+     *
+     * @return string
+     */
+    public static function getTablePrefix()
+    {
+        return 'prefix_';
+    }
 }

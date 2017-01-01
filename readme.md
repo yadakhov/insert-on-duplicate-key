@@ -83,9 +83,16 @@ created_at and updated_at will *not* be updated automatically.  To update you ca
 ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()]
 ```
 
+### Run unit tests
+
+```
+./vendor/bin/phpunit
+```
+
 ### Will this work on Postgresql?
 
 No.  On Duplicate Key Update is only available on MySQL.  Postgresql 9.4 has a similar feature called [UPSERT](https://wiki.postgresql.org/wiki/UPSERT).
+Implementing UPSERT is left as an exercise for the reader.
 
 ### Isn't this the same as updateOrCreate()?
 

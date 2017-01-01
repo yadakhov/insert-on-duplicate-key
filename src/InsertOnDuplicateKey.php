@@ -111,6 +111,16 @@ trait InsertOnDuplicateKey
     }
 
     /**
+     * Get the table prefix.
+     *
+     * @return string
+     */
+    public static function getTablePrefix()
+    {
+        return self::getModelConnectionName()->getTablePrefix();
+    }
+
+    /**
      * Static function for getting the primary key.
      *
      * @return string
@@ -225,7 +235,7 @@ trait InsertOnDuplicateKey
     {
         $first = static::getFirstRow($data);
 
-        $sql  = 'INSERT INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql  = 'INSERT INTO `' . static::getTablePrefix() . static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data) . PHP_EOL;
         $sql .= 'ON DUPLICATE KEY UPDATE ';
 
@@ -249,7 +259,7 @@ trait InsertOnDuplicateKey
     {
         $first = static::getFirstRow($data);
 
-        $sql  = 'INSERT IGNORE INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql  = 'INSERT IGNORE INTO `' . static::getTablePrefix() . static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data);
 
         return $sql;
@@ -266,7 +276,7 @@ trait InsertOnDuplicateKey
     {
         $first = static::getFirstRow($data);
 
-        $sql  = 'REPLACE INTO `' .  static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
+        $sql  = 'REPLACE INTO `' . static::getTablePrefix() . static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data);
 
         return $sql;

@@ -28,6 +28,11 @@ class MainTest extends BootstrapTest
         $this->assertEquals('test_user_table', UserTest::getTableName());
     }
 
+    public function testGetTablePrefix()
+    {
+        $this->assertEquals('prefix_', UserTest::getTablePrefix());
+    }
+
     public function testGetPrimaryKey()
     {
         $this->assertEquals('uuid', UserTest::getPrimaryKey());
@@ -112,7 +117,7 @@ class MainTest extends BootstrapTest
             ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
         ];
 
-        $expected = 'INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?)
 ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
@@ -125,7 +130,7 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
     {
         $data = $this->getDataForInsert();
 
-        $expected = 'INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?), (?,?,?), (?,?,?)
 ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
@@ -138,7 +143,7 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
     {
         $data = $this->getDataForInsert();
 
-        $expected = 'INSERT INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?), (?,?,?), (?,?,?)
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
 
@@ -153,7 +158,7 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
             ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
         ];
 
-        $expected = 'INSERT IGNORE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'INSERT IGNORE INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?)';
 
         $result = $this->invokeMethod($this->user, 'buildInsertIgnoreSql', [$data]);
@@ -165,7 +170,7 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
     {
         $data = $this->getDataForInsert();
 
-        $expected = 'INSERT IGNORE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'INSERT IGNORE INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?), (?,?,?), (?,?,?)';
 
         $result = $this->invokeMethod($this->user, 'buildInsertIgnoreSql', [$data]);
@@ -179,7 +184,7 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
             ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
         ];
 
-        $expected = 'REPLACE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'REPLACE INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?)';
 
         $result = $this->invokeMethod($this->user, 'buildReplaceSql', [$data]);
@@ -191,7 +196,7 @@ ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
     {
         $data = $this->getDataForInsert();
 
-        $expected = 'REPLACE INTO `test_user_table`(`id`,`email`,`name`) VALUES
+        $expected = 'REPLACE INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
 (?,?,?), (?,?,?), (?,?,?)';
 
         $result = $this->invokeMethod($this->user, 'buildReplaceSql', [$data]);
