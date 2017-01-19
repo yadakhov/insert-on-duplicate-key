@@ -16,7 +16,7 @@ trait InsertOnDuplicateKey
      * @param array $data is an array of array.
      * @param array $updateColumns NULL or [] means update all columns
      *
-     * @return bool
+     * @return int 0 if row is not changed, 1 if row is inserted, 2 if row is updated
      */
     public static function insertOnDuplicateKey(array $data, array $updateColumns = null)
     {
@@ -33,7 +33,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return self::getModelConnectionName()->statement($sql, $data);
+        return self::getModelConnectionName()->affectingStatement($sql, $data);
     }
 
     /**
@@ -41,7 +41,7 @@ trait InsertOnDuplicateKey
      *
      * @param array $data
      *
-     * @return bool
+     * @return int 0 if row is ignored, 1 if row is inserted
      */
     public static function insertIgnore(array $data)
     {
@@ -58,7 +58,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return self::getModelConnectionName()->statement($sql, $data);
+        return self::getModelConnectionName()->affectingStatement($sql, $data);
     }
 
     /**
@@ -66,7 +66,7 @@ trait InsertOnDuplicateKey
      *
      * @param array $data
      *
-     * @return bool
+     * @return int 1 if row is inserted without replacements, greater than 1 if rows were replaced
      */
     public static function replace(array $data)
     {
@@ -83,7 +83,7 @@ trait InsertOnDuplicateKey
 
         $data = static::inLineArray($data);
 
-        return self::getModelConnectionName()->statement($sql, $data);
+        return self::getModelConnectionName()->affectingStatement($sql, $data);
     }
 
     /**
