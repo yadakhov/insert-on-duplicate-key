@@ -196,16 +196,20 @@ trait InsertOnDuplicateKey
     /**
      * Build a value list.
      *
-     * @param array $first
+     * @param array $updatedColumns
      *
      * @return string
      */
-    protected static function buildValuesList(array $first)
+    protected static function buildValuesList(array $updatedColumns)
     {
         $out = [];
 
-        foreach (array_keys($first) as $key) {
-            $out[] = sprintf('`%s` = VALUES(`%s`)', $key, $key);
+        foreach ($updatedColumns as $key => $value) {
+            if (is_numeric($key)) {
+                $out[] = sprintf('`%s` = VALUES(`%s`)', $value, $value);
+            } else {
+                $out[] = sprintf('%s = %s', $key, $value);
+            }
         }
 
         return implode(', ', $out);
@@ -240,9 +244,9 @@ trait InsertOnDuplicateKey
         $sql .= 'ON DUPLICATE KEY UPDATE ';
 
         if (empty($updateColumns)) {
-            $sql .= static::buildValuesList($first);
+            $sql .= static::buildValuesList(array_keys($first));
         } else {
-            $sql .= static::buildValuesList(array_combine($updateColumns, $updateColumns));
+            $sql .= static::buildValuesList($updateColumns);
         }
 
         return $sql;

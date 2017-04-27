@@ -63,11 +63,29 @@ class MainTest extends BootstrapTest
 
     public function testBuildValuesList()
     {
-        $data = $this->getDataForInsert();
+        $value = [
+            'id',
+            'email',
+            'name'
+        ];
 
         $expected = '`id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
-        $result = $this->invokeMethod($this->user, 'buildValuesList', [$data[0]]);
+        $result = $this->invokeMethod($this->user, 'buildValuesList', [$value]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBuildValuesListAssociativeArray()
+    {
+        $value = [
+            'id' => 'id + 1',
+            'counter' => 'counter + 2',
+        ];
+
+        $expected = 'id = id + 1, counter = counter + 2';
+
+        $result = $this->invokeMethod($this->user, 'buildValuesList', [$value]);
 
         $this->assertEquals($expected, $result);
     }
@@ -148,6 +166,19 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`)';
 
         $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data, ['name']]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testUpdatedColumnIsAssociativeArray()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
+(?,?,?), (?,?,?), (?,?,?)
+ON DUPLICATE KEY UPDATE counter = counter + 1';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data, ['counter' => 'counter + 1']]);
 
         $this->assertEquals($expected, $result);
     }
