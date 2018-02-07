@@ -144,6 +144,21 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
         $this->assertEquals($expected, $result);
     }
 
+    public function testBuildInsertOnDuplicateSqlWithExclusionSimple()
+    {
+        $data = [
+            ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One']
+        ];
+
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
+(1,?,?)
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data,null,['id']]);
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testBuildInsertOnDuplicateSqlMultiple()
     {
         $data = $this->getDataForInsert();
@@ -153,6 +168,19 @@ ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` =
 ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
 
         $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data]);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testBuildInsertOnDuplicateSqlWithExclusionMultiple()
+    {
+        $data = $this->getDataForInsert();
+
+        $expected = 'INSERT INTO `prefix_test_user_table`(`id`,`email`,`name`) VALUES
+(1,?,?), (2,?,?), (3,?,?)
+ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `email` = VALUES(`email`), `name` = VALUES(`name`)';
+
+        $result = $this->invokeMethod($this->user, 'buildInsertOnDuplicateSql', [$data,null,['id']]);
 
         $this->assertEquals($expected, $result);
     }
