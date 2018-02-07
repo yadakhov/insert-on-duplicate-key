@@ -15,10 +15,11 @@ trait InsertOnDuplicateKey
      *
      * @param array $data is an array of array.
      * @param array $updateColumns NULL or [] means update all columns
+     * @param array $dontEscapeColumns [] esapces all columns, or keys of which columns not to bind
      *
      * @return int 0 if row is not changed, 1 if row is inserted, 2 if row is updated
      */
-    public static function insertOnDuplicateKey(array $data, array $updateColumns = null)
+    public static function insertOnDuplicateKey(array $data, array $updateColumns = null, array $dontEscapeColumns = [])
     {
         if (empty($data)) {
             return false;
@@ -29,9 +30,9 @@ trait InsertOnDuplicateKey
             $data = [$data];
         }
 
-        $sql = static::buildInsertOnDuplicateSql($data, $updateColumns);
+        $sql = static::buildInsertOnDuplicateSql($data, $updateColumns, $dontEscapeColumns);
 
-        $data = static::inLineArray($data);
+        $data = static::inLineArray($data, $dontEscapeColumns);
 
         return self::getModelConnectionName()->affectingStatement($sql, $data);
     }
@@ -140,14 +141,17 @@ trait InsertOnDuplicateKey
      *
      * @return string
      */
-    protected static function buildQuestionMarks($data)
+    protected static function buildQuestionMarks($data, $dontEscapeColumns = [])
     {
         $lines = [];
         foreach ($data as $row) {
-            $count = count($row);
             $questions = [];
-            for ($i = 0; $i < $count; ++$i) {
-                $questions[] = '?';
+            foreach ($row as $key => $value) {
+                if (in_array($key, $dontEscapeColumns)) {
+                    $questions[] = is_a($value, Expression::class) ? $value->__toString() : $value;
+                } else {
+                    $questions[] = '?';
+                }
             }
             $lines[] = '(' . implode(',', $questions) . ')';
         }
@@ -222,9 +226,20 @@ trait InsertOnDuplicateKey
      *
      * @return array
      */
-    protected static function inLineArray(array $data)
+    protected static function inLineArray(array $data, array $dontEscapeColumns = [])
     {
-        return call_user_func_array('array_merge', array_map('array_values', $data));
+        $dataBindings = [];
+        foreach ($data as $row) {
+            foreach ($row as $key => $value) {
+                if (in_array($key, $dontEscapeColumns)) {
+                    continue;
+                } else {
+                    $dataBindings[] = $value;
+                }
+            }
+        }
+
+        return $dataBindings;
     }
 
     /**
@@ -232,15 +247,16 @@ trait InsertOnDuplicateKey
      *
      * @param array $data
      * @param array $updateColumns
+     * @param array $dontEscapeColumns
      *
      * @return string
      */
-    protected static function buildInsertOnDuplicateSql(array $data, array $updateColumns = null)
+    protected static function buildInsertOnDuplicateSql(array $data, array $updateColumns = null, array $dontEscapeColumns = [])
     {
         $first = static::getFirstRow($data);
 
         $sql  = 'INSERT INTO `' . static::getTablePrefix() . static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
-        $sql .=  static::buildQuestionMarks($data) . PHP_EOL;
+        $sql .=  static::buildQuestionMarks($data, $dontEscapeColumns) . PHP_EOL;
         $sql .= 'ON DUPLICATE KEY UPDATE ';
 
         if (empty($updateColumns)) {
