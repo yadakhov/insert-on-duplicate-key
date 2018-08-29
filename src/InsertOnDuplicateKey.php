@@ -142,15 +142,11 @@ trait InsertOnDuplicateKey
      */
     protected static function buildQuestionMarks($data)
     {
-        $lines = [];
-        foreach ($data as $row) {
-            $count = count($row);
-            $questions = [];
-            for ($i = 0; $i < $count; ++$i) {
-                $questions[] = '?';
-            }
-            $lines[] = '(' . implode(',', $questions) . ')';
-        }
+        $row = self::getFirstRow($data);
+        $questionMarks = array_fill(0, count($row), '?');
+
+        $line = '(' . implode(',', $questionMarks) . ')';
+        $lines = array_fill(0, count($data), $line);
 
         return implode(', ', $lines);
     }
