@@ -25,7 +25,7 @@ trait InsertOnDuplicateKey
         }
 
         // Case where $data is not an array of arrays.
-        if (!isset($data[0])) {
+        if (!is_array($data[0])) {
             $data = [$data];
         }
 
