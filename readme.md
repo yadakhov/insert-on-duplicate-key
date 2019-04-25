@@ -33,6 +33,20 @@ class User extends Model
     ];
 ```
 
+Important:  the order of the keys are important.  It should be the same for every arrays.
+The reason is the code uses `array_values()`.  
+
+Do not do this:
+
+```php
+    $users = [
+        ['id' => 1, 'email' => 'user1@email.com', 'name' => 'User One'],
+        ['email' => 'user2@email.com', 'id' => 2, 'name' => 'User Two'],
+        ['email' => 'user3@email.com', 'name' => 'User Three', 'id' => 3],
+    ];
+```
+
+
 #### INSERT ON DUPLICATE KEY UPDATE
 
 ```php
