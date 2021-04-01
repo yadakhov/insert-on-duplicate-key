@@ -5,7 +5,7 @@ require __DIR__.'/../vendor/autoload.php';
 use Illuminate\Database\Eloquent\Model;
 use Yadakhov\InsertOnDuplicateKey;
 
-class BootstrapTest extends \PHPUnit_Framework_TestCase
+class BootstrapTest
 {
     /**
      * Call protected/private method of a class.
