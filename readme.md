@@ -69,6 +69,25 @@ Do not do this:
     ON DUPLICATE KEY UPDATE `email` = VALUES(`email`)
 ```
 
+If users have a numeric column we would like, for example, to sum:
+
+```php
+    $users = [
+        ['id' => 1, 'name' => 'User One', 'heritage' => 1000],
+        ['id' => 2, 'name' => 'User Two', 'heritage' => 2000],
+        ['id' => 3, 'name' => 'User Three', 'heritage' => 1500],
+    ];
+```
+```php
+    User::insertOnDuplicateKey($users, ['heritage' => DB::raw('`heritage` + VALUES(`heritage`)')]);
+```
+```sql
+    -- produces this query
+    INSERT INTO `users`(`id`,`email`,`name`) VALUES
+    (1,'user1@email.com','User One'), (2,'user3@email.com','User Two'), (3,'user3email.com','User Three')
+    ON DUPLICATE KEY UPDATE `heritage` = `heritage` + VALUES(`heritage`)
+```
+
 #### INSERT IGNORE
 ```php
     User::insertIgnore($users);
