@@ -148,7 +148,7 @@ trait InsertOnDuplicateKey
             $questions = [];
             foreach ($row as $key => $value) {
                 if (in_array($key, $dontEscapeColumns)) {
-                    $questions[] = is_a($value, Expression::class) ? $value->__toString() : $value;
+                    $questions[] = $value;
                 } else {
                     $questions[] = '?';
                 }
@@ -257,6 +257,12 @@ trait InsertOnDuplicateKey
 
         $sql  = 'INSERT INTO `' . static::getTablePrefix() . static::getTableName() . '`(' . static::getColumnList($first) . ') VALUES' . PHP_EOL;
         $sql .=  static::buildQuestionMarks($data, $dontEscapeColumns) . PHP_EOL;
+
+        $connection = config('database.default');
+        if ($connection !== 'mysql') {
+            return $sql;
+        }
+
         $sql .= 'ON DUPLICATE KEY UPDATE ';
 
         if (empty($updateColumns)) {
